@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import bodyParser from "body-parser";
 import { globalErrorHandler, notFoundHandler } from "../middlewares/errorHandling.js";
+import testRouter from "../routes/test.js";
 
 
 const app = express();
@@ -20,7 +21,7 @@ app.use(cors(corsOptions));
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json())
 
-
+app.use('/test', testRouter)
 
 app.use(notFoundHandler)
 app.use(globalErrorHandler)
