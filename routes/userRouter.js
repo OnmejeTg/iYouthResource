@@ -6,11 +6,12 @@ import {
   updateUser,
   deleteUser,
 } from "../controllers/userCtrl.js";
+import { userValidationRules, validateUser } from "../validators/userValidator.js";
 
 
 const userRouter = express.Router();
 
-userRouter.post("/", createUser);            // POST /users
+userRouter.post("/", userValidationRules, validateUser, createUser);            // POST /users
 userRouter.get("/:id", getUser);             // GET /users/:id
 userRouter.put("/:id", updateUser);          // PUT /users/:id
 userRouter.delete("/:id", deleteUser);       // DELETE /users/:id
