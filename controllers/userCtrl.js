@@ -10,6 +10,13 @@ const sanitizeUser = (agent) => {
 export const createUser = asyncHandler(async (req, res) => {
   const reqdata = req.body;
   try {
+    // Check if a user with the given email already exists
+    const existingUser = await User.findOne({ email: reqdata.email });
+    if (existingUser) {
+      return res.status(400).send({ message: "Email already in use" });
+    }
+    
+    // Create a new user
     const user = new User(reqdata);
     await user.save();
     const sanitizedData = _.pick(user, ["_id", "email"]);
