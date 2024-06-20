@@ -1,6 +1,9 @@
 import asyncHandler from "express-async-handler";
 import User from "../models/users.js";
 import _ from "lodash";
+import otpGenerator from "otp-generator";
+import OTP from "../models/otp.js";
+import { sendEmail, sendSuccessRegEmail } from "../utils/email.js";
 
 const sanitizeUser = (agent) => {
   const agentObj = agent.toObject();
@@ -15,14 +18,44 @@ export const createUser = asyncHandler(async (req, res) => {
     if (existingUser) {
       return res.status(400).send({ message: "Email already in use" });
     }
-    
+
     // Create a new user
     const user = new User(reqdata);
     await user.save();
+    //Send otp
+    const code = otpGenerator.generate(6, {
+      lowerCaseAlphabets: false,
+      upperCaseAlphabets: false,
+      specialChars: false,
+    });
+
+    const otpExpirationTime = new Date();
+    otpExpirationTime.setMinutes(otpExpirationTime.getMinutes() + 15);
+
+    const otp = new OTP({
+      email: user.email,
+      code,
+      type: "emailVerification",
+      expiresIn: otpExpirationTime,
+    });
+
+    await otp.save();
+    // Send email with OTP
+    const sentMail = await sendEmail(user.email, code);
+    if (sentMail) {
+      console.log("Mail sent:", sentMail);
+      const sanitizedData = _.pick(user, ["_id", "email"]);
+      return res.status(201).send({
+        status: "success",
+        message: "User created successfully and email sent successfully",
+        data: sanitizedData,
+      });
+    }
+    console.log("Mail sent:", false);
     const sanitizedData = _.pick(user, ["_id", "email"]);
     return res.status(201).send({
-      status: "Success",
-      message: "User created successfully",
+      status: "success",
+      message: "User created successfully but email not sent successfully",
       data: sanitizedData,
     });
   } catch (err) {
@@ -30,6 +63,42 @@ export const createUser = asyncHandler(async (req, res) => {
     return res.status(500).send({ message: err.message });
   }
 });
+
+
+export const verifyEmail = asyncHandler(async (req, res) => {
+  try {
+    const { email, otp } = req.body;
+    const user = await User.findOne({ email: email.toLowerCase().trim() });
+    if (!user) {
+      return res.status(404).send({ status: false, message: "User not found" });
+    }
+    const otpData = await OTP.findOne({
+      email: email.toLowerCase().trim(),
+      code: otp,
+      type: "emailVerification",
+      isValid: true,
+    });
+    if (!otpData || otpData.expiresIn < new Date()) {
+      return res.status(404).send({ status: false, message: "Invalid OTP" });
+    }
+    user.isVerified = true;
+    await user.save();
+    await otpData.deleteOne();
+    sendSuccessRegEmail(email);
+    return res.status(200).json({
+      success: true,
+      message: "Account verified successful",
+    });
+  } catch (error) {
+    console.error(error);
+
+    res.status(500).json({
+      success: false,
+      message: "Something went wrong",
+    });
+  }
+});
+
 
 export const getUser = asyncHandler(async (req, res) => {
   const { id } = req.params;

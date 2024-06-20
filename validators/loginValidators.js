@@ -1,8 +1,8 @@
 import { body, validationResult } from "express-validator";
 
 export const loginValidationRules = [
-  body("username").isEmail().withMessage("Email is required"),
-  body("password").notEmpty().withMessage("Password is required"),
+  body("username").trim().toLowerCase().isEmail().withMessage("Email is required"),
+  body("password").trim().notEmpty().withMessage("Password is required"),
 ];
 
 export const validateLogin = (req, res, next) => {
