@@ -1,18 +1,30 @@
 import { body, validationResult } from "express-validator";
 
 export const userValidationRules = [
-  body("name")
+  body("firstName")
     .trim()
     .notEmpty()
-    .withMessage("Name is required")
+    .withMessage("firstName is required")
     .isLength({ min: 2 })
     .withMessage("First name must be at least 2 characters long"),
+  body("lastName")
+    .trim()
+    .notEmpty()
+    .withMessage("lastName is required")
+    .isLength({ min: 2 })
+    .withMessage("last name must be at least 2 characters long"),
   body("email")
     .trim()
     .notEmpty()
     .withMessage("Email is required")
     .isEmail()
     .withMessage("Email is must be a valid"),
+  body("phone")
+    .trim()
+    .notEmpty()
+    .withMessage("Phone is required")
+    .isMobilePhone()
+    .withMessage("Phone is must be a valid"),
   body("password")
     .trim()
     .notEmpty()
