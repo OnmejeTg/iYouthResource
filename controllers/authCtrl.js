@@ -1,6 +1,11 @@
 import User from "../models/users.js";
 import asyncHandler from "express-async-handler";
-import { generateAccessToken, generateRefreshToken } from "../utils/authUtils.js";
+import {sendPassWordResetEmail} from '../utils/email.js'
+import {
+  generateAccessToken,
+  generateRefreshToken,
+  generateForgotPasswordToken
+} from "../utils/authUtils.js";
 
 export const login = asyncHandler(async (req, res) => {
   const { username, password } = req.body;
@@ -9,7 +14,7 @@ export const login = asyncHandler(async (req, res) => {
     if (!user) {
       return res.status(404).send({ message: "User not found" });
     }
-    if(user.isVerified == false) {
+    if (user.isVerified == false) {
       return res.status(401).send({ message: "User not verified" });
     }
     const isMatch = await user.matchPassword(password);
@@ -20,7 +25,7 @@ export const login = asyncHandler(async (req, res) => {
     }
     const payLoad = {
       id: user._id,
-      username: user.email
+      username: user.email,
     };
 
     const accessToken = generateAccessToken(payLoad);
@@ -54,8 +59,36 @@ export const resetPassword = asyncHandler(async (req, res) => {
 });
 
 export const forgotPassword = asyncHandler(async (req, res) => {
-  return res.send("Forgot password...");
+  const { email } = req.body;
+
+  // Check if the user exists
+  const user = await User.findOne({ email });
+  if (!user) {
+    return res.status(404).json({ message: "User not found" });
+  }
+
+  // Generate a JWT token
+  const token = generateForgotPasswordToken({
+    userId: user.id,
+    username: user.email,
+  });
+
+  // Construct the reset link
+  const resetLink = `http://your-frontend-url.com/reset-password?token=${token}`;
+
+  // Send the reset link via email
+  try {
+    const emailSent = await sendPassWordResetEmail(user.email, resetLink);
+    if (!emailSent) {
+      throw new Error("Email sending failed");
+    }
+    return res.json({ message: "Password reset link sent to your email" });
+  } catch (error) {
+    console.error("Error sending email:", error.message);
+    return res.status(500).json({ message: "Error sending email" });
+  }
 });
+
 
 export const verifyEmail = asyncHandler(async (req, res) => {
   return res.send("Verifying email...");
