@@ -9,6 +9,9 @@ export const login = asyncHandler(async (req, res) => {
     if (!user) {
       return res.status(404).send({ message: "User not found" });
     }
+    if(user.isVerified == false) {
+      return res.status(401).send({ message: "User not verified" });
+    }
     const isMatch = await user.matchPassword(password);
     if (!isMatch) {
       return res
@@ -31,7 +34,7 @@ export const login = asyncHandler(async (req, res) => {
       success: true,
       message: "Login successful",
       accessToken: accessToken,
-      refreshToken: refreshToken,
+      // refreshToken: refreshToken,
     });
   } catch (error) {
     console.error("Error during login:", error);

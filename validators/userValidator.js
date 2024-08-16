@@ -19,12 +19,6 @@ export const userValidationRules = [
     .withMessage("Email is required")
     .isEmail()
     .withMessage("Email is must be a valid"),
-  body("phone")
-    .trim()
-    .notEmpty()
-    .withMessage("Phone is required")
-    .isMobilePhone()
-    .withMessage("Phone is must be a valid"),
   body("password")
     .trim()
     .notEmpty()
