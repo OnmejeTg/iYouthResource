@@ -1,10 +1,10 @@
 import User from "../models/users.js";
 import asyncHandler from "express-async-handler";
-import {sendPassWordResetEmail} from '../utils/email.js'
+import { sendPassWordResetEmail } from "../utils/email.js";
 import {
   generateAccessToken,
   generateRefreshToken,
-  generateForgotPasswordToken
+  generateForgotPasswordToken,
 } from "../utils/authUtils.js";
 
 export const login = asyncHandler(async (req, res) => {
@@ -89,7 +89,33 @@ export const forgotPassword = asyncHandler(async (req, res) => {
   }
 });
 
+import jwt from "jsonwebtoken";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 export const verifyEmail = asyncHandler(async (req, res) => {
-  return res.send("Verifying email...");
+  // Route to handle resetting password
+
+  const { token, newPassword } = req.body;
+  const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET;
+
+  try {
+    // Verify the token
+    const decoded = jwt.verify(token, ACCESS_TOKEN_SECRET);
+    const id = decoded.userId;
+    
+    const user = await User.findOne({ _id: id });
+  
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    // Update the user's password (you should hash it in a real app)
+    user.password = newPassword;
+    await user.save();
+
+    return res.json({ message: "Password has been reset successfully" });
+  } catch (error) {
+    return res.status(400).json({ message: "Invalid or expired token" });
+  }
 });
