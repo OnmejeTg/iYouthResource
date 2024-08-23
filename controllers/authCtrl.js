@@ -6,6 +6,7 @@ import {
   generateRefreshToken,
   generateForgotPasswordToken,
 } from "../utils/authUtils.js";
+import passport from "passport"
 
 export const login = asyncHandler(async (req, res) => {
   const { username, password } = req.body;
@@ -50,8 +51,47 @@ export const login = asyncHandler(async (req, res) => {
   }
 });
 
+// export const login = (req, res, next) => {
+//   passport.authenticate("local", (err, user, info) => {
+//     if (err) {
+//       return res
+//         .status(500)
+//         .json({ error: "Authentication failed", details: err });
+//     }
+//     if (!user) {
+//       return res
+//         .status(401)
+//         .json({ error: "Invalid credentials", details: info });
+//     }
+//     req.logIn(user, (err) => {
+//       if (err) {
+//         return res.status(500).json({ error: "Login failed", details: err });
+//       }
+//       return res.status(200).json({ message: "Login successful" });
+//     });
+//   })(req, res, next);
+// };
+
 export const logout = asyncHandler(async (req, res) => {
-  return res.send("Loging out...");
+  if (!req.user) return res.status(401).json({ message: "Unauthorised" });
+  // Log out the user
+  req.logout((err) => {
+    if (err) {
+      return res.status(500).json({ error: "Logout failed", details: err });
+    }
+
+    // Optionally destroy the session if using sessions
+    req.session.destroy((err) => {
+      if (err) {
+        return res
+          .status(500)
+          .json({ error: "Failed to destroy session", details: err });
+      }
+
+      // Send a success response
+      return res.status(200).json({ message: "Logout successful" });
+    });
+  });
 });
 
 export const resetPassword = asyncHandler(async (req, res) => {
@@ -89,11 +129,6 @@ export const forgotPassword = asyncHandler(async (req, res) => {
   }
 });
 
-import jwt from "jsonwebtoken";
-import dotenv from "dotenv";
-
-dotenv.config();
-
 export const verifyEmail = asyncHandler(async (req, res) => {
   // Route to handle resetting password
 
@@ -104,9 +139,9 @@ export const verifyEmail = asyncHandler(async (req, res) => {
     // Verify the token
     const decoded = jwt.verify(token, ACCESS_TOKEN_SECRET);
     const id = decoded.userId;
-    
+
     const user = await User.findOne({ _id: id });
-  
+
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }

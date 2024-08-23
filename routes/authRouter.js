@@ -12,5 +12,6 @@ import { loginValidationRules, validateLogin } from "../validators/loginValidato
 export const authRouter = express.Router();
 
 authRouter.post("/login", loginValidationRules, validateLogin,  login);
+authRouter.post("/logout",  logout);
 authRouter.post("/forgot-password-email",  forgotPassword);
 authRouter.post("/forgot-password-verify",  verifyEmail);

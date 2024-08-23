@@ -101,6 +101,7 @@ export const verifyEmail = asyncHandler(async (req, res) => {
 
 
 export const getUser = asyncHandler(async (req, res) => {
+  console.log(req.user)
   const { id } = req.params;
   const user = await User.findById(id);
   if (!user) {
