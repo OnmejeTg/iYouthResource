@@ -40,6 +40,7 @@ export const login = asyncHandler(async (req, res) => {
       success: true,
       message: "Login successful",
       accessToken: accessToken,
+      user:user,
       // refreshToken: refreshToken,
     });
   } catch (error) {
