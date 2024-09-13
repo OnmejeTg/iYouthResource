@@ -4,6 +4,7 @@ import _ from "lodash";
 import otpGenerator from "otp-generator";
 import OTP from "../models/otp.js";
 import { sendEmail, sendSuccessRegEmail } from "../utils/email.js";
+import Profile from "../models/profile.js";
 
 const sanitizeUser = (agent) => {
   const agentObj = agent.toObject();
@@ -82,6 +83,12 @@ export const verifyEmail = asyncHandler(async (req, res) => {
     }
     user.isVerified = true;
     await user.save();
+
+    const userProfile = new Profile({
+      user: user._id,
+      name: `${user.firstName} ${user.lastName}`,
+    });
+
     await otpData.deleteOne();
     sendSuccessRegEmail(email);
     return res.status(200).json({
@@ -115,20 +122,20 @@ export const getUser = asyncHandler(async (req, res) => {
 
 export const updateUser = asyncHandler(async (req, res) => {
   const { id } = req.params;
-  const user = await User.findById(id);
-  if (!user) {
-    return res.status(404).send({ message: "User not found" });
+  const profile = await Profile.findOne({ user: id });
+  if (!profile) {
+    return res.status(404).send({ message: "User profile not found" });
   }
   try {
-    const updatedUser = await User.findByIdAndUpdate(id, req.body, {
+    const updatedUserProfile = await Profile.findByIdAndUpdate(id, req.body, {
       new: true,
       runValidators: true,
     });
-    const sanitizedUser = sanitizeUser(updatedUser);
+    // const sanitizedUser = sanitizeUser(updatedUserProfile);
     return res.status(200).send({
       status: "Success",
       message: "User updated successfully",
-      data: sanitizedUser,
+      data: updatedUserProfile,
     });
   } catch (err) {
     console.log(err);
