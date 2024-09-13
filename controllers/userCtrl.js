@@ -64,7 +64,6 @@ export const createUser = asyncHandler(async (req, res) => {
   }
 });
 
-
 export const verifyEmail = asyncHandler(async (req, res) => {
   try {
     const { email, otp } = req.body;
@@ -99,9 +98,8 @@ export const verifyEmail = asyncHandler(async (req, res) => {
   }
 });
 
-
 export const getUser = asyncHandler(async (req, res) => {
-  console.log(req.user)
+  console.log(req.user);
   const { id } = req.params;
   const user = await User.findById(id);
   if (!user) {
@@ -172,10 +170,11 @@ export const getUsers = asyncHandler(async (req, res) => {
 });
 
 export const loggedInUser = asyncHandler(async (req, res) => {
+  // console.log("Logged in user", req.user);
   if (!req.user) {
     return res.status(401).send({ message: "User not logged in" });
   }
-  const user = await User.findOne({_id:req.user.id});
+  const user = await User.findOne({ _id: req.user.id });
   const sanitizedUser = sanitizeUser(user);
   return res.status(200).send({
     status: "Success",

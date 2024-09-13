@@ -10,6 +10,8 @@ import { authRouter } from "../routes/authRouter.js";
 import passport from "passport";
 import "../strategies/localStrategy.js";
 import session from "express-session";
+import "dotenv/config";
+import MongoStore from "connect-mongo";
 
 const app = express();
 app.use(express.json());
@@ -28,12 +30,16 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(
   session({
-    secret: "secretcode",
+    secret: process.env.secretkey,
     resave: false,
     saveUninitialized: false,
     cookie: {
       maxAge: 60000 * 60 * 2, // 2 hours
     },
+    rolling: true,
+    store: MongoStore.create({
+      mongoUrl: process.env.MONGO_URI,
+    }),
   })
 );
 app.use(passport.initialize());
