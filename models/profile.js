@@ -5,6 +5,7 @@ const { Schema } = mongoose;
 const profileSchema = new Schema({
   user: {
     type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
     required: true,
   },
   name: {

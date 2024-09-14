@@ -11,11 +11,13 @@ export const summary = async (req, res) => {
 
     // Find income transactions within today's date range
     const incomeTrxn = await Income.find({
+      userProfile: req.user._id,
       date: { $gte: startOfDay, $lt: endOfDay },
     });
 
     // Find expenses transactions within today's date range
     const expensesTrxn = await Expenses.find({
+      userProfile: req.user._id,
       date: { $gte: startOfDay, $lt: endOfDay },
     });
 
@@ -38,5 +40,85 @@ export const summary = async (req, res) => {
   } catch (err) {
     console.error(err);
     return res.status(500).send({ message: "Internal Server Error" });
+  }
+};
+
+export const createIncomeTransaction = async (req, res) => {
+  const { date, amount, category, description, paymentMethod, photo } =
+    req.body;
+
+  // Validate required fields
+  if (!date || !amount || !category) {
+    return res.status(400).send({
+      message: "Please provide date, amount, and category",
+    });
+  }
+
+  try {
+    // Create a new income transaction
+    const income = new Income({
+      userProfile: req.user._id, // Assuming req.user._id contains the logged-in user's ID
+      date,
+      amount,
+      category,
+      description,
+      paymentMethod,
+      photo,
+    });
+
+    // Save the transaction to the database
+    await income.save();
+
+    // Send success response
+    return res.status(201).send({
+      message: "Income added successfully!",
+      data: income,
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).send({
+      message: "Something went wrong",
+      error: error.message || "Internal Server Error",
+    });
+  }
+};
+
+export const createExpensesTransaction = async (req, res) => {
+  const { date, amount, category, description, paymentMethod, photo } =
+    req.body;
+
+  // Validate required fields
+  if (!date || !amount || !category) {
+    return res.status(400).send({
+      message: "Please provide date, amount, and category",
+    });
+  }
+
+  try {
+    // Create a new expenses transaction
+    const expenses = new Expenses({
+      userProfile: req.user._id, // Assuming req.user._id contains the logged-in user's ID
+      date,
+      amount,
+      category,
+      description,
+      paymentMethod,
+      photo,
+    });
+
+    // Save the transaction to the database
+    await expenses.save();
+
+    // Send success response
+    return res.status(201).send({
+      message: "Expenses added successfully!",
+      data: expenses,
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).send({
+      message: "Something went wrong",
+      error: error.message || "Internal Server Error",
+    });
   }
 };

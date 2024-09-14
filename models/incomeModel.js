@@ -3,6 +3,11 @@ import mongoose from "mongoose";
 const { Schema } = mongoose;
 const IncomeSchema = new Schema(
   {
+    userProfile: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Profile",
+      required: true,
+    },
     date: {
       type: Date,
       required: true,
@@ -14,7 +19,7 @@ const IncomeSchema = new Schema(
     category: {
       type: String,
     },
-    Description: {
+    description: {
       type: String,
     },
     paymentMethod: {
