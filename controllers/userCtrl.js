@@ -155,20 +155,27 @@ export const updateUser = asyncHandler(async (req, res) => {
 
 export const deleteUser = asyncHandler(async (req, res) => {
   const { id } = req.params;
-  try {
-    const user = await User.findById(id);
-    if (!user) {
-      return res.status(404).send({ message: "User not found" });
-    }
-    await User.findByIdAndDelete(id);
-    return res.status(200).send({
-      status: "Success",
-      message: "User deleted successfully",
-    });
-  } catch (err) {
-    console.log(err);
-    return res.status(500).send({ message: err.message });
+
+  // Find the user by ID
+  const user = await User.findById(id);
+  if (!user) {
+    return res.status(404).send({ message: "User not found" });
   }
+
+  // Find and delete the user's profile
+  const userProfile = await Profile.findOne({ user: user._id });
+  if (userProfile) {
+    await userProfile.deleteOne();
+  }
+
+  // Delete the user after profile deletion
+  await User.findByIdAndDelete(id);
+
+  // Send success response
+  return res.status(200).send({
+    status: "Success",
+    message: "User and profile deleted successfully",
+  });
 });
 
 export const getUsers = asyncHandler(async (req, res) => {
