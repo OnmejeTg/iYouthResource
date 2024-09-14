@@ -78,6 +78,7 @@ export const verifyEmail = asyncHandler(async (req, res) => {
       type: "emailVerification",
       isValid: true,
     });
+
     if (!otpData || otpData.expiresIn < new Date()) {
       return res.status(404).send({ status: false, message: "Invalid OTP" });
     }
@@ -87,7 +88,9 @@ export const verifyEmail = asyncHandler(async (req, res) => {
     const userProfile = new Profile({
       user: user._id,
       name: `${user.firstName} ${user.lastName}`,
+      email: user.email,
     });
+    userProfile.save();
 
     await otpData.deleteOne();
     sendSuccessRegEmail(email);
@@ -121,16 +124,23 @@ export const getUser = asyncHandler(async (req, res) => {
 });
 
 export const updateUser = asyncHandler(async (req, res) => {
-  const { id } = req.params;
-  const profile = await Profile.findOne({ user: id });
+  if (!req.user) {
+    return res.status(401).send({ message: "Unauthorised" });
+  }
+  console.log(req.user);
+  const profile = await Profile.findOne({ user: req.user._id });
   if (!profile) {
     return res.status(404).send({ message: "User profile not found" });
   }
   try {
-    const updatedUserProfile = await Profile.findByIdAndUpdate(id, req.body, {
-      new: true,
-      runValidators: true,
-    });
+    const updatedUserProfile = await Profile.findByIdAndUpdate(
+      profile._id,
+      req.body,
+      {
+        new: true,
+        runValidators: true,
+      }
+    );
     // const sanitizedUser = sanitizeUser(updatedUserProfile);
     return res.status(200).send({
       status: "Success",

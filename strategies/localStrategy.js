@@ -11,6 +11,9 @@ passport.use(
         if (!user) {
           return done(null, false, { message: "User not found" });
         }
+        if (!user.isVerified) {
+          return done(null, false, { message: "User not verified" });
+        }
         const isMatched = user.matchPassword(password);
         if (!isMatched) {
           return done(null, false, { message: "Invalid password" });
@@ -31,7 +34,11 @@ passport.serializeUser((user, done) => {
 passport.deserializeUser(async (id, done) => {
   try {
     const user = await User.findById(id);
-    done(null, user);
+    if (!user) {
+      done(null, false);
+    } else {
+      done(null, { _id: user._id, role: user.role, email: user.email });
+    }
   } catch (error) {
     console.log("Error during deserialization: ", error);
     done(error);
