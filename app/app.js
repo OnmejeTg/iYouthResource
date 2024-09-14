@@ -12,6 +12,7 @@ import "../strategies/localStrategy.js";
 import session from "express-session";
 import "dotenv/config";
 import MongoStore from "connect-mongo";
+import transactionRouter from "../routes/transactionRouter.js";
 
 const app = express();
 app.use(express.json());
@@ -47,6 +48,7 @@ app.use(passport.session());
 
 app.use("/user", userRouter);
 app.use("/auth", authRouter);
+app.use("/trxn", transactionRouter);
 
 app.use(notFoundHandler);
 app.use(globalErrorHandler);
