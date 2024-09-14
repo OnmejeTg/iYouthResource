@@ -131,7 +131,7 @@ export const sendPassWordResetEmail = async (email, link) => {
           <p>
                 Dear User,
             <br>
-                Use the link below to reset you password
+                Use the OTP below to reset your password. Valid for 15 min
             <br>
             ${link}
             <br>

@@ -7,6 +7,8 @@ import {
   generateForgotPasswordToken,
 } from "../utils/authUtils.js";
 import passport from "passport";
+import otpGenerator from "otp-generator";
+import OTP from "../models/otp.js";
 
 // export const login = asyncHandler(async (req, res) => {
 //   const { username, password } = req.body;
@@ -109,21 +111,39 @@ export const forgotPassword = asyncHandler(async (req, res) => {
   }
 
   // Generate a JWT token
-  const token = generateForgotPasswordToken({
-    userId: user.id,
-    username: user.email,
+  // const token = generateForgotPasswordToken({
+  //   userId: user.id,
+  //   username: user.email,
+  // });
+
+  const code = otpGenerator.generate(6, {
+    lowerCaseAlphabets: false,
+    upperCaseAlphabets: false,
+    specialChars: false,
   });
 
+  const otpExpirationTime = new Date();
+  otpExpirationTime.setMinutes(otpExpirationTime.getMinutes() + 15);
+
+  const otp = new OTP({
+    email: user.email,
+    code,
+    type: "forgotPassword",
+    expiresIn: otpExpirationTime,
+  });
+
+  await otp.save();
+
   // Construct the reset link
-  const resetLink = `http://your-frontend-url.com/reset-password?token=${token}`;
+  // const resetLink = `http://your-frontend-url.com/reset-password?token=${token}`;
 
   // Send the reset link via email
   try {
-    const emailSent = await sendPassWordResetEmail(user.email, resetLink);
+    const emailSent = await sendPassWordResetEmail(user.email, code);
     if (!emailSent) {
       throw new Error("Email sending failed");
     }
-    return res.json({ message: "Password reset link sent to your email" });
+    return res.json({ message: "OTP has been sent to your email" });
   } catch (error) {
     console.error("Error sending email:", error.message);
     return res.status(500).json({ message: "Error sending email" });
@@ -133,15 +153,26 @@ export const forgotPassword = asyncHandler(async (req, res) => {
 export const verifyEmail = asyncHandler(async (req, res) => {
   // Route to handle resetting password
 
-  const { token, newPassword } = req.body;
-  const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET;
-
+  const { otp, newPassword, email } = req.body;
+  if (!otp || !newPassword || !email) {
+    return res
+      .status(400)
+      .send({
+        message: "Please provide  an otp, a secure new password and email",
+      });
+  }
   try {
-    // Verify the token
-    const decoded = jwt.verify(token, ACCESS_TOKEN_SECRET);
-    const id = decoded.userId;
+    const otpData = await OTP.findOne({
+      email: email,
+      code: otp,
+      type: "forgotPassword",
+      isValid: true,
+    });
 
-    const user = await User.findOne({ _id: id });
+    if (!otpData || otpData.expiresIn < new Date()) {
+      return res.status(404).send({ status: false, message: "Invalid OTP" });
+    }
+    const user = await User.findOne({ email });
 
     if (!user) {
       return res.status(404).json({ message: "User not found" });
