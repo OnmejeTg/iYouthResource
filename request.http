@@ -3,6 +3,28 @@ POST http://localhost:5000/auth/login
 Content-Type: application/json
 
 {
-    "email":"email@email.com",
+    "username":"meettg2014@gmail.com",
     "password":"password"
+}
+
+### Create user
+POST http://localhost:5000/user
+Content-Type: application/json
+
+{
+    "firstName":"John",
+    "lastName":"Doe",
+    "email":"meettg2014@gmail.com",
+    "password":"password",
+    "phone":"090645362563"
+    
+}
+
+### Verify user
+POST http://localhost:5000/user/verify
+Content-Type: application/json
+
+{
+    "email":"meettg2014@gmail.com",
+    "otp":"493871"
 }

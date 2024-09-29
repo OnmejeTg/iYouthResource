@@ -42,7 +42,14 @@ export const login = asyncHandler(async (req, res) => {
       success: true,
       message: "Login successful",
       accessToken: accessToken,
-      user: user,
+      user: {
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+        phone: user.phone,
+        role: user.role,
+        isVerified: user.isVerified,
+      },
       // refreshToken: refreshToken,
     });
   } catch (error) {
