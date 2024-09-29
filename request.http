@@ -8,6 +8,14 @@ Content-Type: application/json
     "password":"password"
 }
 
+### logout
+POST http://localhost:5000/auth/logout
+
+### refresh token
+POST http://localhost:5000/auth/refresh-token
+
+
+
 # ---------- USER------------------------------------------
 ### Create user
 POST http://localhost:5000/user
@@ -34,11 +42,11 @@ Content-Type: application/json
 #---------------------TRANSACTION-----------------------------------
 ### summary
 GET http://localhost:5000/trxn/summary
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2ZjkyZWEzODVmMGU5YmQ2ZmYxNjhkMSIsInVzZXJuYW1lIjoibWVldHRnMjAxNEBnbWFpbC5jb20iLCJpYXQiOjE3Mjc2MDg4MDB9.vg6nC0m0AN8vcQOzJ3ccs_DzpXzHmmn7HI_R9WYL8fc
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2ZjkyZWEzODVmMGU5YmQ2ZmYxNjhkMSIsInVzZXJuYW1lIjoibWVldHRnMjAxNEBnbWFpbC5jb20iLCJpYXQiOjE3Mjc2MjI0OTUsImV4cCI6MTcyNzYyMzA5NX0.Uk5ewmFjoxp4OKzkNNCnCfpdic8qQYva6FI1CeDWkrM
 
 ### income
-POST http://localhost:5000/trxn/income
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2ZjkyZWEzODVmMGU5YmQ2ZmYxNjhkMSIsInVzZXJuYW1lIjoibWVldHRnMjAxNEBnbWFpbC5jb20iLCJpYXQiOjE3Mjc2MDg4MDB9.vg6nC0m0AN8vcQOzJ3ccs_DzpXzHmmn7HI_R9WYL8fc
+POST http://localhCxmeXCJ9I0Vl8Wt6lfvzobn_M27pQnm1UHo6ost:5000/trxn/income
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2ZjkyZWEzODVmMGU5YmQ2ZmYxNjhkMSIsInVzZXJuYW1lIjoibWVldHRnMjAxNEBnbWFpbC5jb20iLCJpYXQiOjE3Mjc2MjAzMzEsImV4cCI6MTcyNzYyMDM5MX0.AQu3Bq8DZdgJEiE0pmtPKfJvLEQ3gQ8dn8SzYHqa5vM
 Content-Type: application/json
 
 {
@@ -50,7 +58,7 @@ Content-Type: application/json
 
 ### income
 POST http://localhost:5000/trxn/expenses
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2ZjkyZWEzODVmMGU5YmQ2ZmYxNjhkMSIsInVzZXJuYW1lIjoibWVldHRnMjAxNEBnbWFpbC5jb20iLCJpYXQiOjE3Mjc2MDg4MDB9.vg6nC0m0AN8vcQOzJ3ccs_DzpXzHmmn7HI_R9WYL8fc
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2ZjkyZWEzODVmMGU5YmQ2ZmYxNjhkMSIsInVzZXJuYW1lIjoibWVldHRnMjAxNEBnbWFpbC5jb20iLCJpYXQiOjE3Mjc2MjAzMzEsImV4cCI6MTcyNzYyMDM5MX0.AQu3Bq8DZdgJEiE0pmtPKfJvLEQ3gQ8dn8SzYHqa5vM
 Content-Type: application/json
 
 {

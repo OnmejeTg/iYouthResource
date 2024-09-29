@@ -9,6 +9,9 @@ import {
 import passport from "passport";
 import otpGenerator from "otp-generator";
 import OTP from "../models/otp.js";
+import jwt from "jsonwebtoken";
+import dotenv from "dotenv";
+dotenv.config();
 
 export const login = asyncHandler(async (req, res) => {
   const { username, password } = req.body;
@@ -42,11 +45,12 @@ export const login = asyncHandler(async (req, res) => {
       isVerified: user.isVerified,
     };
 
-    // res.cookie("refreshToken", refreshToken, {
-    //   httpOnly: true,
-    //   path: "/user/refresh_token",
-    //   maxAge: 7 * 24 * 60 * 60 * 1000,
-    // });
+    res.cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      secure: true,
+      path: "/auth/refresh-token",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
     return res.status(200).json({
       success: true,
       message: "Login successful",
@@ -84,26 +88,40 @@ export const login = asyncHandler(async (req, res) => {
 //   })(req, res, next);
 // };
 
-export const logout = asyncHandler(async (req, res) => {
-  if (!req.user) return res.status(401).json({ message: "Unauthorised" });
-  // Log out the user
-  req.logout((err) => {
-    if (err) {
-      return res.status(500).json({ error: "Logout failed", details: err });
-    }
+export const refreshAccessToken = (req, res) => {
+  const refreshToken = req.cookies.refreshToken; // Assuming refresh token is stored in a cookie
+  if (!refreshToken) {
+    return res.status(403).json({ message: "No refresh token provided" });
+  }
 
-    // Optionally destroy the session if using sessions
-    req.session.destroy((err) => {
+  try {
+    // Verify the refresh token
+    jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, user) => {
       if (err) {
-        return res
-          .status(500)
-          .json({ error: "Failed to destroy session", details: err });
+        return res.status(403).json({ message: "Invalid refresh token" });
       }
 
-      // Send a success response
-      return res.status(200).json({ message: "Logout successful" });
+      // If valid, create a new access token
+      const newAccessToken = generateAccessToken({ id: user.id });
+      return res.json({ accessToken: newAccessToken });
     });
+  } catch (error) {
+    console.log(error.message);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export const logout = asyncHandler(async (req, res) => {
+  // Clear the refresh token cookie
+  res.clearCookie("refreshToken", {
+    httpOnly: true,
+    secure: true, // Ensure this matches your cookie security settings
+    path: "/auth/refresh-token",
   });
+
+  return res
+    .status(200)
+    .json({ message: "Logout successful, refresh token cleared" });
 });
 
 export const resetPassword = asyncHandler(async (req, res) => {
