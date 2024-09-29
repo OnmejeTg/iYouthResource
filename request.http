@@ -55,6 +55,14 @@ Content-Type: application/json
 
 {
     "amount":"2000",
-    "date":"2024-09-29:17:50", 
+    "date":"2024-09-29:10:50", 
     "category":"Electricity"
 }
+
+### all-income
+GET http://localhost:5000/trxn/all-income
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2ZjkyZWEzODVmMGU5YmQ2ZmYxNjhkMSIsInVzZXJuYW1lIjoibWVldHRnMjAxNEBnbWFpbC5jb20iLCJpYXQiOjE3Mjc2MDg4MDB9.vg6nC0m0AN8vcQOzJ3ccs_DzpXzHmmn7HI_R9WYL8fc
+
+### all-expenses
+GET http://localhost:5000/trxn/all-expenses
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2ZjkyZWEzODVmMGU5YmQ2ZmYxNjhkMSIsInVzZXJuYW1lIjoibWVldHRnMjAxNEBnbWFpbC5jb20iLCJpYXQiOjE3Mjc2MDg4MDB9.vg6nC0m0AN8vcQOzJ3ccs_DzpXzHmmn7HI_R9WYL8fc

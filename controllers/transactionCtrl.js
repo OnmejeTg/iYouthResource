@@ -153,3 +153,51 @@ export const createExpensesTransaction = async (req, res) => {
     });
   }
 };
+
+export const allIncomeTrxn = async (req, res) => {
+  try {
+    // Fetch all income transactions for the logged-in user
+    const allTrxn = await Income.find({ userProfile: req.user.id });
+
+    if (!allTrxn.length) {
+      return res.status(404).json({
+        message: "No income transactions found",
+      });
+    }
+
+    return res.status(200).json({
+      message: "Income transactions retrieved successfully",
+      data: allTrxn,
+    });
+  } catch (error) {
+    console.error("Error retrieving income transactions:", error.message);
+    return res.status(500).json({
+      message: "An error occurred while retrieving income transactions",
+      error: error.message || "Internal Server Error",
+    });
+  }
+};
+
+export const allExpensesTrxn = async (req, res) => {
+  try {
+    // Fetch all income transactions for the logged-in user
+    const allTrxn = await Expenses.find({ userProfile: req.user.id });
+
+    if (!allTrxn.length) {
+      return res.status(404).json({
+        message: "No income transactions found",
+      });
+    }
+
+    return res.status(200).json({
+      message: "Income transactions retrieved successfully",
+      data: allTrxn,
+    });
+  } catch (error) {
+    console.error("Error retrieving income transactions:", error.message);
+    return res.status(500).json({
+      message: "An error occurred while retrieving income transactions",
+      error: error.message || "Internal Server Error",
+    });
+  }
+};
