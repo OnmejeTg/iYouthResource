@@ -1,3 +1,4 @@
+#-----------------------AUTHORIZATION----------------------
 ### Login
 POST http://localhost:5000/auth/login
 Content-Type: application/json
@@ -7,6 +8,7 @@ Content-Type: application/json
     "password":"password"
 }
 
+# ---------- USER------------------------------------------
 ### Create user
 POST http://localhost:5000/user
 Content-Type: application/json
@@ -27,4 +29,32 @@ Content-Type: application/json
 {
     "email":"meettg2014@gmail.com",
     "otp":"493871"
+}
+
+#---------------------TRANSACTION-----------------------------------
+### summary
+GET http://localhost:5000/trxn/summary
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2ZjkyZWEzODVmMGU5YmQ2ZmYxNjhkMSIsInVzZXJuYW1lIjoibWVldHRnMjAxNEBnbWFpbC5jb20iLCJpYXQiOjE3Mjc2MDg4MDB9.vg6nC0m0AN8vcQOzJ3ccs_DzpXzHmmn7HI_R9WYL8fc
+
+### income
+POST http://localhost:5000/trxn/income
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2ZjkyZWEzODVmMGU5YmQ2ZmYxNjhkMSIsInVzZXJuYW1lIjoibWVldHRnMjAxNEBnbWFpbC5jb20iLCJpYXQiOjE3Mjc2MDg4MDB9.vg6nC0m0AN8vcQOzJ3ccs_DzpXzHmmn7HI_R9WYL8fc
+Content-Type: application/json
+
+{
+    "amount":"2000",
+    "date":"2024-09-29:14:40", 
+    "category":"Clothes"
+}
+
+
+### income
+POST http://localhost:5000/trxn/expenses
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2ZjkyZWEzODVmMGU5YmQ2ZmYxNjhkMSIsInVzZXJuYW1lIjoibWVldHRnMjAxNEBnbWFpbC5jb20iLCJpYXQiOjE3Mjc2MDg4MDB9.vg6nC0m0AN8vcQOzJ3ccs_DzpXzHmmn7HI_R9WYL8fc
+Content-Type: application/json
+
+{
+    "amount":"2000",
+    "date":"2024-09-29:17:50", 
+    "category":"Electricity"
 }

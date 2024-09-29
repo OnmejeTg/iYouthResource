@@ -33,6 +33,15 @@ export const login = asyncHandler(async (req, res) => {
 
     const accessToken = generateAccessToken(payLoad);
     const refreshToken = generateRefreshToken(payLoad);
+    const loggedInUser = {
+      firstName: user.firstName,
+      lastName: user.lastName,
+      email: user.email,
+      phone: user.phone,
+      role: user.role,
+      isVerified: user.isVerified,
+    };
+
     // res.cookie("refreshToken", refreshToken, {
     //   httpOnly: true,
     //   path: "/user/refresh_token",
@@ -42,14 +51,7 @@ export const login = asyncHandler(async (req, res) => {
       success: true,
       message: "Login successful",
       accessToken: accessToken,
-      user: {
-        firstName: user.firstName,
-        lastName: user.lastName,
-        email: user.email,
-        phone: user.phone,
-        role: user.role,
-        isVerified: user.isVerified,
-      },
+      user: loggedInUser,
       // refreshToken: refreshToken,
     });
   } catch (error) {
