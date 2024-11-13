@@ -9,7 +9,7 @@ const isValidUserData = (userData) => {
 //TODO: Add expiresIn value before production
 const generateAccessToken = (payLoad) => {
   const options = {
-    expiresIn: "10m",
+    expiresIn: "10d",
   };
   return jwt.sign(payLoad, process.env.ACCESS_TOKEN_SECRET, options);
 };

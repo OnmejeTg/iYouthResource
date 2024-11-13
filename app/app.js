@@ -14,6 +14,7 @@ import session from "express-session";
 import "dotenv/config";
 import MongoStore from "connect-mongo";
 import transactionRouter from "../routes/transactionRouter.js";
+import fundingRouter from "../routes/fundingRouter.js";
 import { isLoggedin } from "../middlewares/auth.js";
 
 const app = express();
@@ -52,6 +53,7 @@ app.use(passport.session());
 app.use("/user", userRouter);
 app.use("/auth", authRouter);
 app.use("/trxn", isLoggedin, transactionRouter);
+app.use("/fundings", fundingRouter);
 
 app.use(notFoundHandler);
 app.use(globalErrorHandler);

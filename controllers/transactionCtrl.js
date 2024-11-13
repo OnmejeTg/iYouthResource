@@ -4,8 +4,8 @@ import Income from "../models/incomeModel.js";
 export const summary = async (req, res) => {
   try {
     const startOfDay = new Date();
-    startOfDay.setHours(0, 0, 0, 0); // Set time to 00:00:00 for the beginning of the day
 
+    startOfDay.setHours(0, 0, 0, 0); // Set time to 00:00:00 for the beginning of the day
     const endOfDay = new Date();
     endOfDay.setHours(23, 59, 59, 999); // Set time to 23:59:59 for the end of the day
 
