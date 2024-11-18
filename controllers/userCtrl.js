@@ -198,7 +198,7 @@ export const loggedInUser = asyncHandler(async (req, res) => {
   if (!req.user) {
     return res.status(401).send({ message: "User not logged in" });
   }
-  const user = await User.findOne({ _id: req.user._id });
+  const user = await User.findOne({ _id: req.user.id });
   const sanitizedUser = sanitizeUser(user);
   return res.status(200).send({
     status: "Success",

@@ -19,7 +19,7 @@ const userRouter = express.Router();
 userRouter.post("/", userValidationRules, validateUser, createUser); // POST /users
 userRouter.get("/", getUsers); // GET /users
 userRouter.post("/verify", verifyEmail);
-userRouter.get("/@me", loggedInUser); // Use this to get the logged in user for jwt authentication
+userRouter.get("/@me", isLoggedin, loggedInUser); // Use this to get the logged in user for jwt authentication
 // userRouter.get("/logged-in-user", loggedInUser); //Use this to get the logged in user for session authentication
 userRouter.get("/:id", getUser); // GET /users/:id
 userRouter.put("/", updateUser); // PUT /users/:id
