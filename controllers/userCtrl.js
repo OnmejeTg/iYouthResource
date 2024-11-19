@@ -128,7 +128,7 @@ export const updateUser = asyncHandler(async (req, res) => {
     return res.status(401).send({ message: "Unauthorised" });
   }
   console.log(req.user);
-  const profile = await Profile.findOne({ user: req.user._id });
+  const profile = await Profile.findOne({ user: req.user.id });
   if (!profile) {
     return res.status(404).send({ message: "User profile not found" });
   }
@@ -194,7 +194,7 @@ export const getUsers = asyncHandler(async (req, res) => {
 });
 
 export const loggedInUser = asyncHandler(async (req, res) => {
-  console.log("Logged in user", req.user);
+  // console.log("Logged in user", req.user);
   if (!req.user) {
     return res.status(401).send({ message: "User not logged in" });
   }
