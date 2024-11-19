@@ -5,6 +5,7 @@ import otpGenerator from "otp-generator";
 import OTP from "../models/otp.js";
 import { sendEmail, sendSuccessRegEmail } from "../utils/email.js";
 import Profile from "../models/profile.js";
+import { uploadImage } from "../utils/cloudinary.js";
 
 const sanitizeUser = (agent) => {
   const agentObj = agent.toObject();
@@ -125,30 +126,46 @@ export const getUser = asyncHandler(async (req, res) => {
 
 export const updateUser = asyncHandler(async (req, res) => {
   if (!req.user) {
-    return res.status(401).send({ message: "Unauthorised" });
+    return res.status(401).send({ message: "Unauthorized" });
   }
-  console.log(req.user);
+
   const profile = await Profile.findOne({ user: req.user.id });
   if (!profile) {
     return res.status(404).send({ message: "User profile not found" });
   }
+
+  const imageBuffer = req.file?.buffer;
+  let image = profile.image; // Retain current image by default
+
+  if (imageBuffer) {
+    const folder = "IYR/profile/images/";
+    // Upload the new image
+    image = await uploadImage(imageBuffer, folder);
+  }
+
+  // Merge existing profile data with incoming updates
+  const updatedData = {
+    ...req.body,
+    image, // Update image if a new one was uploaded, else retain the current one
+  };
+
   try {
     const updatedUserProfile = await Profile.findByIdAndUpdate(
       profile._id,
-      req.body,
+      updatedData,
       {
         new: true,
         runValidators: true,
       }
     );
-    // const sanitizedUser = sanitizeUser(updatedUserProfile);
+
     return res.status(200).send({
       status: "Success",
       message: "User updated successfully",
       data: updatedUserProfile,
     });
   } catch (err) {
-    console.log(err);
+    console.error(err);
     return res.status(500).send({ message: err.message });
   }
 });
@@ -199,10 +216,11 @@ export const loggedInUser = asyncHandler(async (req, res) => {
     return res.status(401).send({ message: "User not logged in" });
   }
   const user = await User.findOne({ _id: req.user.id });
+  const profile = await Profile.findOne({ user: req.user.id }).populate("user");
   const sanitizedUser = sanitizeUser(user);
   return res.status(200).send({
     status: "Success",
     message: "User fetched successfully",
-    data: sanitizedUser,
+    data: profile,
   });
 });
