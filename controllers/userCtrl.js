@@ -88,7 +88,8 @@ export const verifyEmail = asyncHandler(async (req, res) => {
 
     const userProfile = new Profile({
       user: user._id,
-      name: `${user.firstName} ${user.lastName}`,
+      firstName: user.firstName,
+      lastName: user.lastName,
       email: user.email,
     });
     userProfile.save();
@@ -148,6 +149,15 @@ export const updateUser = asyncHandler(async (req, res) => {
     ...req.body,
     image, // Update image if a new one was uploaded, else retain the current one
   };
+  const firstName = updatedData.firstName;
+  const lastName = updatedData.lastName;
+
+  if (firstName) {
+    await User.findByIdAndUpdate(req.user.id, { firstName }, { new: true });
+  }
+  if (lastName) {
+    await User.findByIdAndUpdate(req.user.id, { lastName }, { new: true });
+  }
 
   try {
     const updatedUserProfile = await Profile.findByIdAndUpdate(
