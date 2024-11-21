@@ -1,8 +1,18 @@
 import Funding from "../models/Funding.js";
+import { uploadImage } from "../utils/cloudinary.js";
 
 // Create a new funding
 export const createFunding = async (req, res) => {
   try {
+    const imageBuffer = req.file?.buffer;
+    let image = ""; // Retain current image by default
+
+    if (imageBuffer) {
+      const folder = "IYR/funding/";
+      // Upload the new image
+      image = await uploadImage(imageBuffer, folder);
+      req.body.photo = image; // Update image in request body for saving to the database
+    }
     const funding = await Funding.create(req.body);
     res.status(201).json({
       message: "Funding created successfully",
@@ -75,5 +85,31 @@ export const deleteFunding = async (req, res) => {
     res
       .status(500)
       .json({ message: "Failed to delete funding", error: error.message });
+  }
+};
+
+export const handlePublish = async (req, res) => {
+  try {
+    const funding = await Funding.findByIdAndUpdate(
+      req.params.id,
+      { published: req.body.published },
+      { new: true }
+    );
+    if (!funding) {
+      return res.status(404).json({ message: "Funding not found" });
+    }
+    res
+      .status(200)
+      .json({
+        message: "Funding published status updated successfully",
+        data: funding,
+      });
+  } catch (error) {
+    res
+      .status(500)
+      .json({
+        message: "Failed to update funding status",
+        error: error.message,
+      });
   }
 };
