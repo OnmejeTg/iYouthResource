@@ -25,6 +25,7 @@ const corsOptions = {
     "https://new-project-35520.web.app",
     "http://localhost:5173",
     "http://localhost:5174",
+    "https://iry-admin.netlify.app/",
   ],
   optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204
   allowedHeaders: "Authorization,Origin,X-Requested-With,Content-Type,Accept",
