@@ -7,9 +7,9 @@ const FundingSchema = new Schema(
       type: String,
       required: true,
     },
-    amount: Number,
+    amount: String,
     eligibility: String,
-    applicationDeadline: Date,
+    applicationDeadline: String,
     description: String,
     photo: {
       type: String,
