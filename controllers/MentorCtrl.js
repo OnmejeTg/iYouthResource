@@ -63,7 +63,7 @@ export const getMentorById = async (req, res) => {
 export const updateMentor = async (req, res) => {
   try {
     const { name, occupation, facebook, twitter, instagram } = req.body;
-    console.log(req.body);
+    // console.log(req.body);
     // Extract profile image if available
     const profileImg = req.files?.profileImg?.[0];
     const imageBuffer = profileImg?.buffer;
