@@ -11,7 +11,7 @@ export const createFunding = async (req, res) => {
       const folder = "IYR/funding/";
       // Upload the new image
       image = await uploadImage(imageBuffer, folder);
-      req.body.photo = image; // Update image in request body for saving to the database
+      req.body.photo = image; 
     }
     const funding = await Funding.create(req.body);
     res.status(201).json({

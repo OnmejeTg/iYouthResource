@@ -21,6 +21,10 @@ const FundingSchema = new Schema(
       type: Boolean,
       default: true,
     },
+    tags: {
+      type: [String],
+      enum: ["closing soon", "top pick", "coming soon", "active"],
+    },
   },
   { timestamps: true }
 );

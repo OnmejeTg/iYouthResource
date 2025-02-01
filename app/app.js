@@ -20,6 +20,7 @@ import taxRouter from "../routes/taxRouter.js";
 import pdfRouter from "../routes/PdfRouter.js";
 import mentorRouter from "../routes/MentorRouter.js";
 import workshopRouter from "../routes/workshopRouter.js";
+import articleRouter from "../routes/articleRouter.js";
 
 const app = express();
 app.use(express.json());
@@ -63,6 +64,7 @@ app.use("/tax", taxRouter);
 app.use("/pdfs", pdfRouter);
 app.use("/mentors", mentorRouter);
 app.use("/workshops", workshopRouter);
+app.use("/articles", articleRouter);
 
 app.use(notFoundHandler);
 app.use(globalErrorHandler);
