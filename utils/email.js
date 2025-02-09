@@ -164,3 +164,82 @@ export const sendPassWordResetEmail = async (email, link) => {
     return false;
   }
 };
+
+// export const sendContactEmail = async (email, name, message) => {
+//   try {
+//     // Configure Nodemailer Transporter with App Password
+//     const transporter = nodemailer.createTransport({
+//       host: "smtp.gmail.com",
+//       port: 465, // Use 465 for secure TLS/SSL or 587 for STARTTLS
+//       secure: true, // true for 465, false for 587
+//       auth: {
+//         user: process.env.SENDER_MAIL, // Your Gmail address
+//         pass: process.env.APP_PASSWORD, // Your App Password (not your Gmail password)
+//       },
+//     });
+
+//     // Email options
+//     const mailOptions = {
+//       from: `"${name}" <${process.env.SENDER_MAIL}>`, // Sender's name and email
+//       to: "tonmeje@gmail.com", // Recipient's email
+//       subject: "New Contact Form Submission",
+//       html: `Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}`,
+//       headers: {
+//         "X-Priority": "1",
+//         "X-MSMail-Priority": "High",
+//         Importance: "High",
+//       },
+//     };
+
+//     // Send Email
+//     const info = await transporter.sendMail(mailOptions);
+//     console.log("Email Sent:", info);
+
+//     return info.accepted.length > 0; // Returns true if email was accepted
+//   } catch (error) {
+//     console.error("Error sending contact email:", error);
+//     return false;
+//   }
+// };
+
+export const sendContactEmail = async (email, name, message) => {
+  try {
+    const transporter = nodemailer.createTransport({
+      // service: 'process.env.SERVICE',
+      host: "smtp.gmail.com",
+      port: 465,
+      secure: true,
+      auth: {
+        pass: process.env.APP_PASSWORD,
+        user: process.env.SENDER_MAIL,
+      },
+    });
+
+    const sendCompanyMail = await transporter.sendMail({
+      from: "tonmeje@gmail.com",
+      to: "bizgrowthapp@gmail.com",
+      subject: "New Contact Form Submission",
+      html: `<p><strong>Name</strong>: ${name}</p>
+      <p><strong>Email:</strong> ${email}</p>
+      <br/>
+      <strong>Message:</strong> <br/>${message}`,
+      headers: {
+        "x-priority": "1",
+        "x-msmail-priority": "High",
+        importance: "high",
+      },
+    });
+
+    if (
+      sendCompanyMail &&
+      sendCompanyMail.response &&
+      sendCompanyMail.response.startsWith("250")
+    ) {
+      return true;
+    } else {
+      return false;
+    }
+  } catch (error) {
+    console.log(error, "email not sent");
+  }
+};

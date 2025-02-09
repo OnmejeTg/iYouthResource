@@ -102,7 +102,7 @@ export const updateWorkshop = async (req, res) => {
 // Delete a mentor by ID
 export const deleteworkshop = async (req, res) => {
   try {
-    const mentor = await Mentor.findByIdAndDelete(req.params.id);
+    const mentor = await Workshop.findByIdAndDelete(req.params.id);
     if (!mentor) {
       return res.status(404).send({ message: "Mentor not found" });
     }

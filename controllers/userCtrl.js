@@ -3,7 +3,11 @@ import User from "../models/users.js";
 import _ from "lodash";
 import otpGenerator from "otp-generator";
 import OTP from "../models/otp.js";
-import { sendEmail, sendSuccessRegEmail } from "../utils/email.js";
+import {
+  sendContactEmail,
+  sendEmail,
+  sendSuccessRegEmail,
+} from "../utils/email.js";
 import Profile from "../models/profile.js";
 import { uploadImage } from "../utils/cloudinary.js";
 
@@ -233,4 +237,47 @@ export const loggedInUser = asyncHandler(async (req, res) => {
     message: "User fetched successfully",
     data: profile,
   });
+});
+
+export const emailSub = asyncHandler(async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    const user = new User({
+      email,
+      firstName: "Email Subscriber",
+      lastName: "Email Subscriber",
+      password: "password", // Consider hashing if used for authentication
+    });
+
+    await user.save();
+
+    res.status(201).json({ message: "Email subscription successful" });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "Subscription failed", error: error.message });
+  }
+});
+
+export const contact = asyncHandler(async (req, res) => {
+  try {
+    const { name, email, message } = req.body;
+
+    // Await the email sending function
+    const sendmail = await sendContactEmail(email, name, message);
+
+    if (sendmail) {
+      console.log("Message sent successfully");
+      return res.status(200).json({ message: "Message sent successfully" });
+    } else {
+      console.log("Failed to send message");
+      return res.status(500).json({ message: "Failed to send message" });
+    }
+  } catch (error) {
+    console.error("Error:", error);
+    return res
+      .status(500)
+      .json({ message: "Internal server error", error: error.message });
+  }
 });

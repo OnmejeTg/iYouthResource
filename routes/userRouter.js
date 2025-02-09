@@ -7,6 +7,8 @@ import {
   deleteUser,
   verifyEmail,
   loggedInUser,
+  emailSub,
+  contact,
 } from "../controllers/userCtrl.js";
 import {
   userValidationRules,
@@ -25,5 +27,7 @@ userRouter.get("/@me", isLoggedin, loggedInUser); // Use this to get the logged 
 userRouter.get("/:id", isLoggedin, getUser); // GET /users/:id
 userRouter.put("/", isLoggedin, memoryupload.single("file"), updateUser); // PUT /users/:id
 userRouter.delete("/:id", deleteUser); // DELETE /users/:id
+userRouter.post("/email-sub", emailSub);
+userRouter.post("/contact", contact);
 
 export default userRouter;
