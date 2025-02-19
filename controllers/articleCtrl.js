@@ -6,8 +6,34 @@ import Article from "../models/ArticleModel.js";
 // };
 
 export const createArticle = async (req, res) => {
-  const article = await Article.create(req.body);
-  res.status(201).json(article);
+  try {
+    // Extract data from request body
+    const { title, content, link } = req.body;
+
+    // Validate required fields
+    if (!title || !content) {
+      return res.status(400).json({ error: "Title and content are required." });
+    }
+
+    // Handle file (if a file is uploaded)
+    const thumbnail = req.file ? req.file.path : null;
+
+    // Create the article
+    const article = await Article.create({
+      title,
+      content,
+      link,
+      thumbnail,
+    });
+
+    // Return success response
+    return res
+      .status(201)
+      .json({ message: "Article created successfully", article });
+  } catch (error) {
+    console.error("Error creating article:", error);
+    return res.status(500).json({ error: "Internal server error" });
+  }
 };
 
 export const getArticleById = async (req, res) => {
