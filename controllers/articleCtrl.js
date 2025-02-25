@@ -1,5 +1,5 @@
 import Article from "../models/ArticleModel.js";
-
+import mongoose from "mongoose";
 // const sanitizeArticle = (article) => {
 //   const articleObj = article.toObject();
 //   return _.omit(articleObj, ["content"]);
@@ -9,6 +9,7 @@ export const createArticle = async (req, res) => {
   try {
     // Extract data from request body
     const { title, content, link } = req.body;
+    // console.log(req.body);
 
     // Validate required fields
     if (!title || !content) {
@@ -56,21 +57,38 @@ export const updateArticle = async (req, res) => {
 };
 
 export const deleteArticle = async (req, res) => {
-  const article = await Article.findByIdAndDelete(req.params.id);
-  if (!article) {
-    return res.status(404).json({ message: "Article not found" });
-  }
-  res.json({ message: "Article deleted successfully" });
-
   try {
-    const article = await Article.findByIdAndDelete(req.params.id);
-    if (!article) {
+    const { id } = req.params;
+
+    // Validate ID format
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ message: "Invalid article ID format" });
+    }
+
+    const deletedArticle = await Article.findByIdAndDelete(id);
+
+    if (!deletedArticle) {
       return res.status(404).json({ message: "Article not found" });
     }
-    res.json({ message: "Article deleted successfully" });
+
+    // Consider adding cleanup operations for related resources here
+    // Example: delete associated thumbnail file from storage
+
+    return res.status(200).json({
+      success: true,
+      message: "Article deleted successfully",
+      deletedId: id,
+    });
   } catch (error) {
     console.error("Error deleting article:", error);
-    res.status(500).json({ message: "Error deleting article" });
+
+    return res.status(500).json({
+      success: false,
+      message:
+        process.env.NODE_ENV === "production"
+          ? "Internal server error"
+          : error.message,
+    });
   }
 };
 

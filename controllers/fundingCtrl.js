@@ -11,8 +11,9 @@ export const createFunding = async (req, res) => {
       const folder = "IYR/funding/";
       // Upload the new image
       image = await uploadImage(imageBuffer, folder);
-      req.body.photo = image; 
+      req.body.photo = image;
     }
+    // console.log(req.body);
     const funding = await Funding.create(req.body);
     res.status(201).json({
       message: "Funding created successfully",
@@ -98,18 +99,14 @@ export const handlePublish = async (req, res) => {
     if (!funding) {
       return res.status(404).json({ message: "Funding not found" });
     }
-    res
-      .status(200)
-      .json({
-        message: "Funding published status updated successfully",
-        data: funding,
-      });
+    res.status(200).json({
+      message: "Funding published status updated successfully",
+      data: funding,
+    });
   } catch (error) {
-    res
-      .status(500)
-      .json({
-        message: "Failed to update funding status",
-        error: error.message,
-      });
+    res.status(500).json({
+      message: "Failed to update funding status",
+      error: error.message,
+    });
   }
 };
