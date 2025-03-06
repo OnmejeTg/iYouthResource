@@ -1,5 +1,6 @@
 import Article from "../models/ArticleModel.js";
 import mongoose from "mongoose";
+import { uploadImage } from "../utils/cloudinary.js";
 // const sanitizeArticle = (article) => {
 //   const articleObj = article.toObject();
 //   return _.omit(articleObj, ["content"]);
@@ -7,25 +8,25 @@ import mongoose from "mongoose";
 
 export const createArticle = async (req, res) => {
   try {
-    // Extract data from request body
-    const { title, content, link } = req.body;
-    // console.log(req.body);
-
+    
     // Validate required fields
-    if (!title || !content) {
+    if (!req.body.title || !req.body.content) {
       return res.status(400).json({ error: "Title and content are required." });
     }
 
-    // Handle file (if a file is uploaded)
-    const thumbnail = req.file ? req.file.path : null;
+    const imageBuffer = req.file?.buffer;
+    
+    let thumbnail = ""; // Retain current image by default
+
+    if (imageBuffer) {
+      const folder = "IYR/article/";
+      // Upload the new image
+      thumbnail = await uploadImage(imageBuffer, folder);
+      req.body.thumbnail = thumbnail;
+    }
 
     // Create the article
-    const article = await Article.create({
-      title,
-      content,
-      link,
-      thumbnail,
-    });
+    const article = await Article.create(req.body);
 
     // Return success response
     return res
