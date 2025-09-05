@@ -21,6 +21,7 @@ import pdfRouter from "../routes/PdfRouter.js";
 import mentorRouter from "../routes/MentorRouter.js";
 import workshopRouter from "../routes/workshopRouter.js";
 import articleRouter from "../routes/articleRouter.js";
+import learningRouter from "../routes/learningRoute.js";
 
 const app = express();
 app.use(express.json());
@@ -66,6 +67,7 @@ app.use("/pdfs", pdfRouter);
 app.use("/mentors", mentorRouter);
 app.use("/workshops", workshopRouter);
 app.use("/articles", articleRouter);
+app.use("/learning", learningRouter);
 
 app.use(notFoundHandler);
 app.use(globalErrorHandler);
