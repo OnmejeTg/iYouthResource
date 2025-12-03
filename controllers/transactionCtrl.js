@@ -1,42 +1,89 @@
 import Expenses from "../models/expensesModel.js";
 import Income from "../models/incomeModel.js";
+import { uploadImage } from "../utils/cloudinary.js";
 
 export const summary = async (req, res) => {
   try {
-    const startOfDay = new Date();
+    const { date, startDate, endDate } = req.query;
 
-    startOfDay.setHours(0, 0, 0, 0); // Set time to 00:00:00 for the beginning of the day
-    const endOfDay = new Date();
-    endOfDay.setHours(23, 59, 59, 999); // Set time to 23:59:59 for the end of the day
+    const getDayBounds = (inputDate) => {
+      const start = new Date(inputDate);
+      const end = new Date(inputDate);
+      start.setHours(0, 0, 0, 0);
+      end.setHours(23, 59, 59, 999);
+      return { start, end };
+    };
 
-    // Find income transactions within today's date range
-    const incomeTrxn = await Income.find({
-      userProfile: req.user.id,
-      date: { $gte: startOfDay, $lt: endOfDay },
-    });
+    let rangeStart;
+    let rangeEnd;
 
-    // Find expenses transactions within today's date range
-    const expensesTrxn = await Expenses.find({
-      userProfile: req.user.id,
-      date: { $gte: startOfDay, $lt: endOfDay },
-    });
+    if (date) {
+      const parsedDate = new Date(date);
 
-    // Calculate the total income
+      if (isNaN(parsedDate)) {
+        return res.status(400).json({ message: "Invalid date provided" });
+      }
+
+      ({ start: rangeStart, end: rangeEnd } = getDayBounds(parsedDate));
+    } else if (startDate || endDate) {
+      if (!startDate || !endDate) {
+        return res
+          .status(400)
+          .json({ message: "Please provide both startDate and endDate" });
+      }
+
+      const parsedStart = new Date(startDate);
+      const parsedEnd = new Date(endDate);
+
+      if (isNaN(parsedStart) || isNaN(parsedEnd)) {
+        return res.status(400).json({ message: "Invalid date range provided" });
+      }
+
+      if (parsedStart > parsedEnd) {
+        return res
+          .status(400)
+          .json({ message: "startDate cannot be later than endDate" });
+      }
+
+      rangeStart = new Date(parsedStart);
+      rangeStart.setHours(0, 0, 0, 0);
+      rangeEnd = new Date(parsedEnd);
+      rangeEnd.setHours(23, 59, 59, 999);
+    } else {
+      ({ start: rangeStart, end: rangeEnd } = getDayBounds(new Date()));
+    }
+
+    // Fetch income and expenses concurrently for the requested window
+    const [incomeTrxn, expensesTrxn] = await Promise.all([
+      Income.find({
+        userProfile: req.user.id,
+        date: { $gte: rangeStart, $lte: rangeEnd },
+      }),
+      Expenses.find({
+        userProfile: req.user.id,
+        date: { $gte: rangeStart, $lte: rangeEnd },
+      }),
+    ]);
+
     const incomeAmount = incomeTrxn.reduce(
       (total, income) => total + income.amount,
       0
     );
-
-    // Calculate the total expenses
     const expensesAmount = expensesTrxn.reduce(
-      (total, income) => total + income.amount,
+      (total, expense) => total + expense.amount,
       0
     );
 
-    // Send response with the total summary
-    return res
-      .status(200)
-      .send({ income: incomeAmount, expenses: expensesAmount });
+    return res.status(200).json({
+      range: {
+        start: rangeStart.toISOString(),
+        end: rangeEnd.toISOString(),
+      },
+      income: incomeAmount,
+      expenses: expensesAmount,
+      incomeTransactions: incomeTrxn,
+      expensesTransactions: expensesTrxn,
+    });
   } catch (err) {
     console.error(err);
     return res.status(500).send({ message: "Internal Server Error" });
@@ -71,6 +118,15 @@ export const createIncomeTransaction = async (req, res) => {
       });
     }
 
+    // Upload photo if provided (file or existing URL)
+    const photoFile = req.files?.photo?.[0];
+    const folder = "IYR/transactions/income";
+    let photoUrl = photo || "";
+
+    if (photoFile?.buffer) {
+      photoUrl = await uploadImage(photoFile.buffer, folder);
+    }
+
     // Create a new income transaction
     const income = new Income({
       userProfile: req.user.id, // Assuming req.user.id contains the logged-in user's ID
@@ -79,7 +135,7 @@ export const createIncomeTransaction = async (req, res) => {
       category,
       description,
       paymentMethod,
-      photo,
+      photo: photoUrl,
     });
 
     // Save the transaction to the database
@@ -126,15 +182,23 @@ export const createExpensesTransaction = async (req, res) => {
   }
 
   try {
+    const photoFile = req.files?.photo?.[0];
+    const folder = "IYR/transactions/expenses";
+    let photoUrl = photo || "";
+
+    if (photoFile?.buffer) {
+      photoUrl = await uploadImage(photoFile.buffer, folder);
+    }
+
     // Create a new expenses transaction
     const expenses = new Expenses({
       userProfile: req.user.id, // Assuming req.user._id contains the logged-in user's ID
-      date,
+      date: inputDate,
       amount,
       category,
       description,
       paymentMethod,
-      photo,
+      photo: photoUrl,
     });
 
     // Save the transaction to the database
