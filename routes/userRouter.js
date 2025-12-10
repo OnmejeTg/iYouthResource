@@ -20,13 +20,13 @@ import { memoryupload } from "../utils/multer.js";
 const userRouter = express.Router();
 
 userRouter.post("/", userValidationRules, validateUser, createUser); // POST /users
-userRouter.get("/", getUsers); // GET /users
+userRouter.get("/", isLoggedin, getUsers); // GET /users
 userRouter.post("/verify", verifyEmail);
 userRouter.get("/@me", isLoggedin, loggedInUser); // Use this to get the logged in user for jwt authentication
 // userRouter.get("/logged-in-user", loggedInUser); //Use this to get the logged in user for session authentication
 userRouter.get("/:id", isLoggedin, getUser); // GET /users/:id
 userRouter.put("/", isLoggedin, memoryupload.single("file"), updateUser); // PUT /users/:id
-userRouter.delete("/:id", deleteUser); // DELETE /users/:id
+// userRouter.delete("/:id", deleteUser); // DELETE /users/:id
 userRouter.post("/email-sub", emailSub);
 userRouter.post("/contact", contact);
 
