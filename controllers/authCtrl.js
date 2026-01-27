@@ -228,7 +228,7 @@ export const resendOtp = asyncHandler(async (req, res) => {
       isValid: true,
     });
     if (otpData) {
-      return res.status(400).json({ message: "OTP already sent" });
+      await otpData.deleteOne();
     }
     const code = otpGenerator.generate(6, {
       lowerCaseAlphabets: false,
