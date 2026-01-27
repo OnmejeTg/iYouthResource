@@ -69,6 +69,7 @@ export const summary = async (req, res) => {
       (total, income) => total + income.amount,
       0
     );
+    
     const expensesAmount = expensesTrxn.reduce(
       (total, expense) => total + expense.amount,
       0

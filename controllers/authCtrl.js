@@ -124,9 +124,6 @@ export const logout = asyncHandler(async (req, res) => {
     .json({ message: "Logout successful, refresh token cleared" });
 });
 
-export const resetPassword = asyncHandler(async (req, res) => {
-  return res.send("Reseting password...");
-});
 
 export const forgotPassword = asyncHandler(async (req, res) => {
   const { email } = req.body;
@@ -134,7 +131,7 @@ export const forgotPassword = asyncHandler(async (req, res) => {
   // Check if the user exists
   const user = await User.findOne({ email });
   if (!user) {
-    return res.status(404).json({ message: "User not found" });
+    return res.status(404).json({ message: "Not successful" });
   }
 
   // Generate a JWT token
@@ -211,3 +208,50 @@ export const verifyEmail = asyncHandler(async (req, res) => {
     return res.status(400).json({ message: "Invalid or expired token" });
   }
 });
+
+export const resendOtp = asyncHandler(async (req, res) => {
+  const { email, type } = req.body;
+  if (!email || !type) {
+    return res.status(400).send({
+      message: "Please provide an email and type",
+    });
+  } 
+
+  try {
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    const otpData = await OTP.findOne({
+      email: email,
+      type: type,
+      isValid: true,
+    });
+    if (otpData) {
+      return res.status(400).json({ message: "OTP already sent" });
+    }
+    const code = otpGenerator.generate(6, {
+      lowerCaseAlphabets: false,
+      upperCaseAlphabets: false,
+      specialChars: false,
+    });
+    const otpExpirationTime = new Date();
+    otpExpirationTime.setMinutes(otpExpirationTime.getMinutes() + 15);
+    const otp = new OTP({
+      email: user.email,
+      code,
+      type: type,
+      expiresIn: otpExpirationTime,
+    });
+    await otp.save();
+    const emailSent = await sendPassWordResetEmail(user.email, code);
+    if (!emailSent) {
+      throw new Error("Email sending failed");
+    }
+    return res.json({ message: "OTP has been sent to your email" });
+  } catch (error) {
+    console.error("Error sending email:", error.message);
+    return res.status(500).json({ message: "Error sending email" });
+  }
+});
+  
