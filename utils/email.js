@@ -7,17 +7,17 @@ export const sendEmail = async (email, otp) => {
   try {
     const transporter = nodemailer.createTransport({
       // service: 'process.env.SERVICE',
-      host: "smtp.gmail.com",
-      port: 465,
-      secure: true,
+      host: process.env.SMTP_HOST,
+      port: process.env.SMTP_PORT,
+      secure: process.env.SMTP_SECURE,
       auth: {
-        pass: process.env.APP_PASSWORD,
-        user: process.env.SENDER_MAIL,
+        pass: process.env.SMTP_PASS,
+        user: process.env.SMTP_USER,
       },
     });
 
     const sendCompanyMail = await transporter.sendMail({
-      from: "tonmeje@gmail.com",
+      from: process.env.SMTP_FROM,
       to: email,
       subject: "iYouth Email Verification",
       html: ` 
@@ -59,17 +59,17 @@ export const sendSuccessRegEmail = async (email) => {
   try {
     const transporter = nodemailer.createTransport({
       // service: 'process.env.SERVICE',
-      host: "smtp.gmail.com",
-      port: 465,
-      secure: true,
+      host: process.env.SMTP_HOST,
+      port: process.env.SMTP_PORT,
+      secure: process.env.SMTP_SECURE,
       auth: {
-        pass: process.env.APP_PASSWORD,
-        user: process.env.SENDER_MAIL,
+        pass: process.env.SMTP_PASS,
+        user: process.env.SMTP_USER,
       },
     });
 
     const sendCompanyMail = await transporter.sendMail({
-      from: "tonmeje@gmail.com",
+      from: process.env.SMTP_FROM,
       to: email,
       subject: "iYouth Verification Successful",
       html: ` 
@@ -114,17 +114,17 @@ export const sendPassWordResetEmail = async (email, link) => {
   try {
     const transporter = nodemailer.createTransport({
       // service: 'process.env.SERVICE',
-      host: "smtp.gmail.com",
-      port: 465,
-      secure: true,
+      host: process.env.SMTP_HOST,
+      port: process.env.SMTP_PORT,
+      secure: process.env.SMTP_SECURE,
       auth: {
-        pass: process.env.APP_PASSWORD,
-        user: process.env.SENDER_MAIL,
+        pass: process.env.SMTP_PASS,
+        user: process.env.SMTP_USER,
       },
     });
 
     const sendCompanyMail = await transporter.sendMail({
-      from: "tonmeje@gmail.com",
+      from: process.env.SMTP_FROM,
       to: email,
       subject: "iYouth Password Reset",
       html: ` 
@@ -206,18 +206,18 @@ export const sendContactEmail = async (email, name, message) => {
   try {
     const transporter = nodemailer.createTransport({
       // service: 'process.env.SERVICE',
-      host: "smtp.gmail.com",
-      port: 465,
-      secure: true,
+      host: process.env.SMTP_HOST,
+      port: process.env.SMTP_PORT,
+      secure: process.env.SMTP_SECURE,
       auth: {
-        pass: process.env.APP_PASSWORD,
-        user: process.env.SENDER_MAIL,
+        pass: process.env.SMTP_PASS,
+        user: process.env.SMTP_USER,
       },
     });
 
     const sendCompanyMail = await transporter.sendMail({
-      from: "tonmeje@gmail.com",
-      to: "bizgrowthapp@gmail.com",
+      from: process.env.SMTP_FROM,
+      to: process.env.SMTP_USER,
       subject: "New Contact Form Submission",
       html: `<p><strong>Name</strong>: ${name}</p>
       <p><strong>Email:</strong> ${email}</p>
