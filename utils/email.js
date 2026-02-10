@@ -1,26 +1,21 @@
-import nodemailer from "nodemailer";
+import * as Brevo from "@getbrevo/brevo";
 import dotenv from "dotenv";
 
 dotenv.config();
 
+const apiInstance = new Brevo.TransactionalEmailsApi();
+
+apiInstance.setApiKey(
+  Brevo.TransactionalEmailsApiApiKeys.apiKey,
+  process.env.BREVO_API_KEY
+);
+
 export const sendEmail = async (email, otp) => {
   try {
-    const transporter = nodemailer.createTransport({
-      // service: 'process.env.SERVICE',
-      host: process.env.SMTP_HOST,
-      port: process.env.SMTP_PORT,
-      secure: process.env.SMTP_SECURE,
-      auth: {
-        pass: process.env.SMTP_PASS,
-        user: process.env.SMTP_USER,
-      },
-    });
+    const sendSmtpEmail = new Brevo.SendSmtpEmail();
 
-    const sendCompanyMail = await transporter.sendMail({
-      from: process.env.SMTP_FROM,
-      to: email,
-      subject: "iYouth Email Verification",
-      html: ` 
+    sendSmtpEmail.subject = "iYouth Email Verification";
+    sendSmtpEmail.htmlContent = ` 
           <p>Dear User,
           <br>
           Thank you for registering with us. Your One Time Password (OTP) for email verification is:
@@ -31,48 +26,28 @@ export const sendEmail = async (email, otp) => {
           <br>
           Best regards,<br>
           iYouth Team </p>
+          `;
+    sendSmtpEmail.sender = { name: "iYouth Team", email: process.env.SENDER_EMAIL };
+    sendSmtpEmail.to = [{ email: email }];
 
-          `,
-      headers: {
-        "x-priority": "1",
-        "x-msmail-priority": "High",
-        importance: "high",
-      },
-    });
-
-    if (
-      sendCompanyMail &&
-      sendCompanyMail.response &&
-      sendCompanyMail.response.startsWith("250")
-    ) {
+    const data = await apiInstance.sendTransacEmail(sendSmtpEmail);
+    // console.log(data);
+    if (data && data.body && data.body.messageId) {
       return true;
-    } else {
-      return false;
     }
+    return false;
   } catch (error) {
     console.log(error, "email not sent");
+    return false;
   }
 };
 
 export const sendSuccessRegEmail = async (email) => {
-  // return console.log("email", message);
   try {
-    const transporter = nodemailer.createTransport({
-      // service: 'process.env.SERVICE',
-      host: process.env.SMTP_HOST,
-      port: process.env.SMTP_PORT,
-      secure: process.env.SMTP_SECURE,
-      auth: {
-        pass: process.env.SMTP_PASS,
-        user: process.env.SMTP_USER,
-      },
-    });
+    const sendSmtpEmail = new Brevo.SendSmtpEmail();
 
-    const sendCompanyMail = await transporter.sendMail({
-      from: process.env.SMTP_FROM,
-      to: email,
-      subject: "iYouth Verification Successful",
-      html: ` 
+    sendSmtpEmail.subject = "iYouth Verification Successful";
+    sendSmtpEmail.htmlContent = ` 
           <p>
                 Dear User,
             <br>
@@ -86,48 +61,27 @@ export const sendSuccessRegEmail = async (email) => {
             <br>
                 iYouth Team 
           </p>
-           
-            `,
-      headers: {
-        "x-priority": "1",
-        "x-msmail-priority": "High",
-        importance: "high",
-      },
-    });
+            `;
+    sendSmtpEmail.sender = { name: "iYouth Team", email: process.env.SENDER_EMAIL };
+    sendSmtpEmail.to = [{ email: email }];
 
-    if (
-      sendCompanyMail &&
-      sendCompanyMail.response &&
-      sendCompanyMail.response.startsWith("250")
-    ) {
+    const data = await apiInstance.sendTransacEmail(sendSmtpEmail);
+    if (data && data.body && data.body.messageId) {
       return true;
-    } else {
-      return false;
     }
+    return false;
   } catch (error) {
     console.log(error, "email not sent");
+    return false;
   }
 };
 
 export const sendPassWordResetEmail = async (email, link) => {
-  // return console.log("email", message);
   try {
-    const transporter = nodemailer.createTransport({
-      // service: 'process.env.SERVICE',
-      host: process.env.SMTP_HOST,
-      port: process.env.SMTP_PORT,
-      secure: process.env.SMTP_SECURE,
-      auth: {
-        pass: process.env.SMTP_PASS,
-        user: process.env.SMTP_USER,
-      },
-    });
+    const sendSmtpEmail = new Brevo.SendSmtpEmail();
 
-    const sendCompanyMail = await transporter.sendMail({
-      from: process.env.SMTP_FROM,
-      to: email,
-      subject: "iYouth Password Reset",
-      html: ` 
+    sendSmtpEmail.subject = "iYouth Password Reset";
+    sendSmtpEmail.htmlContent = ` 
           <p>
                 Dear User,
             <br>
@@ -141,105 +95,43 @@ export const sendPassWordResetEmail = async (email, link) => {
             <br>
                 iYouth Team 
           </p>
-           
-            `,
-      headers: {
-        "x-priority": "1",
-        "x-msmail-priority": "High",
-        importance: "high",
-      },
-    });
+            `;
+    sendSmtpEmail.sender = { name: "iYouth Team", email: process.env.SENDER_EMAIL };
+    sendSmtpEmail.to = [{ email: email }];
 
-    if (
-      sendCompanyMail &&
-      sendCompanyMail.response &&
-      sendCompanyMail.response.startsWith("250")
-    ) {
+    const data = await apiInstance.sendTransacEmail(sendSmtpEmail);
+    // console.log(data);
+    if (data && data.body && data.body.messageId) {
       return true;
-    } else {
-      return false;
     }
+    return false;
   } catch (error) {
     console.log(error, "email not sent");
     return false;
   }
 };
 
-// export const sendContactEmail = async (email, name, message) => {
-//   try {
-//     // Configure Nodemailer Transporter with App Password
-//     const transporter = nodemailer.createTransport({
-//       host: "smtp.gmail.com",
-//       port: 465, // Use 465 for secure TLS/SSL or 587 for STARTTLS
-//       secure: true, // true for 465, false for 587
-//       auth: {
-//         user: process.env.SENDER_MAIL, // Your Gmail address
-//         pass: process.env.APP_PASSWORD, // Your App Password (not your Gmail password)
-//       },
-//     });
-
-//     // Email options
-//     const mailOptions = {
-//       from: `"${name}" <${process.env.SENDER_MAIL}>`, // Sender's name and email
-//       to: "tonmeje@gmail.com", // Recipient's email
-//       subject: "New Contact Form Submission",
-//       html: `Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}`,
-//       headers: {
-//         "X-Priority": "1",
-//         "X-MSMail-Priority": "High",
-//         Importance: "High",
-//       },
-//     };
-
-//     // Send Email
-//     const info = await transporter.sendMail(mailOptions);
-//     console.log("Email Sent:", info);
-
-//     return info.accepted.length > 0; // Returns true if email was accepted
-//   } catch (error) {
-//     console.error("Error sending contact email:", error);
-//     return false;
-//   }
-// };
-
 export const sendContactEmail = async (email, name, message) => {
   try {
-    const transporter = nodemailer.createTransport({
-      // service: 'process.env.SERVICE',
-      host: process.env.SMTP_HOST,
-      port: process.env.SMTP_PORT,
-      secure: process.env.SMTP_SECURE,
-      auth: {
-        pass: process.env.SMTP_PASS,
-        user: process.env.SMTP_USER,
-      },
-    });
+    const sendSmtpEmail = new Brevo.SendSmtpEmail();
 
-    const sendCompanyMail = await transporter.sendMail({
-      from: process.env.SMTP_FROM,
-      to: process.env.SMTP_USER,
-      subject: "New Contact Form Submission",
-      html: `<p><strong>Name</strong>: ${name}</p>
+    sendSmtpEmail.subject = "New Contact Form Submission";
+    sendSmtpEmail.htmlContent = `<p><strong>Name</strong>: ${name}</p>
       <p><strong>Email:</strong> ${email}</p>
       <br/>
-      <strong>Message:</strong> <br/>${message}`,
-      headers: {
-        "x-priority": "1",
-        "x-msmail-priority": "High",
-        importance: "high",
-      },
-    });
+      <strong>Message:</strong> <br/>${message}`;
+    
+    sendSmtpEmail.sender = { name: "iYouth Contact Form", email: process.env.SENDER_EMAIL };
+    sendSmtpEmail.to = [{ email: process.env.SMTP_USER }];
+    sendSmtpEmail.replyTo = { email: email, name: name };
 
-    if (
-      sendCompanyMail &&
-      sendCompanyMail.response &&
-      sendCompanyMail.response.startsWith("250")
-    ) {
+    const data = await apiInstance.sendTransacEmail(sendSmtpEmail);
+    if (data && data.body && data.body.messageId) {
       return true;
-    } else {
-      return false;
     }
+    return false;
   } catch (error) {
     console.log(error, "email not sent");
+    return false;
   }
 };
